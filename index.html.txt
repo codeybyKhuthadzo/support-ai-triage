@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Support Triage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-8">
+
+    <div class="max-w-2xl mx-auto">
+        <header class="mb-10">
+            <h1 class="text-3xl font-bold text-blue-400"><i class="fa-solid fa-robot mr-3"></i>Support AI Triage</h1>
+            <p class="text-slate-400">Classify and prioritize support tickets instantly.</p>
+        </header>
+
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl mb-8">
+            <label class="block text-sm font-medium mb-2 text-slate-300">Customer Message:</label>
+            <textarea id="ticketInput" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Paste customer issue here... e.g. 'I cannot login and I need to pay my invoice urgently!'"></textarea>
+            
+            <button onclick="analyzeTicket()" class="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                Analyze Priority <i class="fa-solid fa-magnifying-glass-chart"></i>
+            </button>
+        </div>
+
+        <div id="resultCard" class="hidden bg-slate-800 p-6 rounded-2xl border-l-8 border-blue-500 animate-in fade-in duration-500">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-xl font-bold">Analysis Result</h2>
+                <span id="priorityTag" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest"></span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-900 rounded-lg">
+                    <p class="text-xs text-slate-500 uppercase">Department</p>
+                    <p id="deptResult" class="font-semibold text-blue-300"></p>
+                </div>
+                <div class="p-4 bg-slate-900 rounded-lg">
+                    <p class="text-xs text-slate-500 uppercase">Est. Response Time</p>
+                    <p id="timeResult" class="font-semibold text-slate-200"></p>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
+                <p class="text-sm italic text-blue-200" id="aiReasoning"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function analyzeTicket() {
+            const text = document.getElementById('ticketInput').value.toLowerCase();
+            const resultCard = document.getElementById('resultCard');
+            
+            // 1. Simple Keyword "AI" Logic
+            let priority = "Medium";
+            let dept = "General Support";
+            let color = "bg-yellow-500";
+            let reason = "";
+
+            if (text.includes('urgent') || text.includes('emergency') || text.includes('broken') || text.includes('login')) {
+                priority = "High";
+                color = "bg-red-500";
+            }
+
+            if (text.includes('pay') || text.includes('invoice') || text.includes('money') || text.includes('refund')) {
+                dept = "Finance / Billing";
+                reason = "Financial keywords detected. Routing to Billing team.";
+            } else if (text.includes('login') || text.includes('password') || text.includes('api')) {
+                dept = "Technical Engineering";
+                reason = "Access/Technical issue detected. Escalating to Dev team.";
+            } else {
+                reason = "Standard query. Routing to Customer Success.";
+            }
+
+            // 2. Display Results
+            resultCard.classList.remove('hidden');
+            resultCard.style.borderLeftColor = priority === "High" ? "#ef4444" : "#eab308";
+            
+            document.getElementById('priorityTag').innerText = priority;
+            document.getElementById('priorityTag').className = `px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${color} text-white`;
+            document.getElementById('deptResult').innerText = dept;
+            document.getElementById('timeResult').innerText = priority === "High" ? "< 30 Minutes" : "2 - 4 Hours";
+            document.getElementById('aiReasoning').innerText = "AI Insight: " + reason;
+        }
+    </script>
+</body>
+</html>
